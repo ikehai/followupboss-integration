@@ -72,7 +72,7 @@ def create_lead(
         message:      Free-text inquiry message or notes.
         price_min:    Minimum budget/price.
         price_max:    Maximum budget/price.
-        tags:         List of tag strings to apply to the lead.
+        tags:         Additional tag strings to apply. "AI Created" is always added automatically.
         assigned_to:  Agent email address to assign the lead to.
 
     Returns:
@@ -102,8 +102,12 @@ def create_lead(
         payload["priceMin"] = price_min
     if price_max is not None:
         payload["priceMax"] = price_max
-    if tags:
-        payload["tags"] = tags
+
+    # Always include the AI-created tag; merge with any caller-supplied tags
+    default_tags = ["AI Created"]
+    merged_tags = list(set(default_tags + (tags or [])))
+    payload["tags"] = merged_tags
+
     if assigned_to:
         payload["assigned"] = assigned_to
 
@@ -177,7 +181,7 @@ def create_task(person_id: int, name: str, task_type: str = "Call", due_date: st
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    print("Follow Up Boss Integration - Smoke Test")
+    print("Follow Up Boss Integration -- Smoke Test")
     print("=" * 50)
 
     result = create_lead(
